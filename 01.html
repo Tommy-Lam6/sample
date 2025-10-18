@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>康怡中醫 - 專業診療預約平台</title>
+    <link rel="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="01.css">
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="logo">
+            <i>🌿</i> 康怡中醫
+        </div>
+        <div class="nav-links">
+            <a href="#services">服務項目</a>
+            <a href="#AI query">AI 查詢</a>
+            <a href="#booking">立即預約</a>
+            <a href="#login" id="login-link">登入/註冊</a>
+            <a href="#account" id="account-link" style="display:none;">我的帳戶</a>
+        </div>
+    </nav>
+
+    <!-- 主內容區 -->
+    <main class="container">
+        <!-- 歡迎橫幅 -->
+        <section class="hero">
+            <h1>專業中醫診療服務</h1>
+            <p>傳統智慧與現代技術的完美結合，為您提供優質的健康服務。立即預約，享受專業中醫師的個性化治療。</p>
+            <button class="btn pulse" onclick="scrollToBooking()">立即預約</button>
+        </section>
+
+        <!-- 服務項目 -->
+        <section id="services">
+            <h2 class="section-title">我們的服務</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>中醫開方</h3>
+                        <p>15分鐘專業診療</p>
+                    </div>
+                    <div class="service-body">
+                        <p>專業中醫師根據您的體質和症狀，為您量身定制中藥處方。</p>
+                        <p><strong>適用於:</strong> 各種慢性病調理、亞健康狀態改善、體質調理。</p>
+                        <p><strong>注意事項:</strong> 請攜帶過往病歷和檢查報告（如有）。</p>
+                    </div>
+                    <div class="service-footer">
+                        <span class="price">$200</span>
+                        <button class="service-btn" onclick="selectService(1)">預約</button>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>針灸治療</h3>
+                        <p>15分鐘專業治療</p>
+                    </div>
+                    <div class="service-body">
+                        <p>運用傳統針灸技術，疏通經絡，調和氣血，緩解疼痛。</p>
+                        <p><strong>適用於:</strong> 各種痛症、神經系統疾病、內科雜病。</p>
+                        <p><strong>注意事項:</strong> 治療前請適量進食，避免空腹接受治療。</p>
+                    </div>
+                    <div class="service-footer">
+                        <span class="price">$250</span>
+                        <button class="service-btn" onclick="selectService(2)">預約</button>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>推拿按摩</h3>
+                        <p>30分鐘專業手法</p>
+                    </div>
+                    <div class="service-body">
+                        <p>傳統中醫推拿手法，放鬆肌肉，緩解疲勞，促進循環。</p>
+                        <p><strong>適用於:</strong> 肌肉酸痛、疲勞乏力、運動損傷恢復。</p>
+                        <p><strong>注意事項:</strong> 治療後請多飲溫水，當天避免沖洗冷水。</p>
+                    </div>
+                    <div class="service-footer">
+                        <span class="price">$350</span>
+                        <button class="service-btn" onclick="selectService(3)">預約</button>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-header">
+                        <h3>新症全面診療</h3>
+                        <p>1小時15分鐘全面檢查</p>
+                    </div>
+                    <div class="service-body">
+                        <p>包含詳細問診、舌診、脈診及綜合治療方案制定。</p>
+                        <p><strong>適用於:</strong> 首次就診患者，需要全面診斷和治療方案者。</p>
+                        <p><strong>注意事項:</strong> 請預留充足時間，攜帶所有相關醫療記錄。</p>
+                    </div>
+                    <div class="service-footer">
+                        <span class="price">$600</span>
+                        <button class="service-btn" onclick="selectService(4)">預約</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 預約區域 -->
+        <section id="booking">
+            <h2 class="section-title">預約診療服務</h2>
+            <div class="booking-container">
+                <div id="auth-forms">
+                    <div class="form-group">
+                        <label for="email">電子郵箱</label>
+                        <input type="email" id="email" class="form-control" placeholder="請輸入您的郵箱">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密碼</label>
+                        <input type="password" id="password" class="form-control" placeholder="請輸入密碼">
+                    </div>
+                    <button class="btn" onclick="login()">登入</button>
+                    <p style="margin-top: 1rem;">還沒有帳號？ <a href="#" style="color: var(--primary);">點擊註冊</a></p>
+                </div>
+
+                <div id="booking-form" style="display:none;">
+                    <div class="form-group">
+                        <label>選擇服務</label>
+                        <div>
+                            <button class="service-btn" onclick="selectService(1)">中醫開方</button>
+                            <button class="service-btn" onclick="selectService(2)">針灸治療</button>
+                            <button class="service-btn" onclick="selectService(3)">推拿按摩</button>
+                            <button class="service-btn" onclick="selectService(4)">新症全面診療</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>選擇日期</label>
+                        <div class="calendar">
+                            <!-- 日曆日期將通過JavaScript生成 -->
+                            <div class="calendar-day">1</div>
+                            <div class="calendar-day">2</div>
+                            <div class="calendar-day">3</div>
+                            <div class="calendar-day">4</div>
+                            <div class="calendar-day">5</div>
+                            <div class="calendar-day">6</div>
+                            <div class="calendar-day">7</div>
+                            <!-- 更多日期 -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>選擇時間</label>
+                        <div class="time-slots">
+                            <div class="time-slot">09:00</div>
+                            <div class="time-slot">09:30</div>
+                            <div class="time-slot">10:00</div>
+                            <div class="time-slot">10:30</div>
+                            <div class="time-slot">11:00</div>
+                            <div class="time-slot">11:30</div>
+                            <div class="time-slot">14:00</div>
+                            <div class="time-slot">14:30</div>
+                            <div class="time-slot">15:00</div>
+                            <div class="time-slot">15:30</div>
+                            <div class="time-slot">16:00</div>
+                            <div class="time-slot">16:30</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" id="confirm-booking">確認預約</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 用戶帳戶區域 -->
+        <section id="account" class="account-section" style="display:none;">
+            <h2 class="section-title">我的帳戶</h2>
+            <div class="user-info">
+                <p><strong>姓名:</strong> 張先生</p>
+                <p><strong>郵箱:</strong> example@email.com</p>
+                <p><strong>電話:</strong> 1234-5678</p>
+            </div>
+            
+            <div class="upcoming-appointments">
+                <h3>我的預約</h3>
+                <div class="appointments-list">
+                    <div class="service-card">
+                        <div class="service-header">
+                            <h3>中醫開方</h3>
+                            <p>2023年12月15日 10:00</p>
+                        </div>
+                        <div class="service-body">
+                            <p>狀態: <span style="color: var(--secondary);">已確認</span></p>
+                            <p>預計時長: 15分鐘</p>
+                        </div>
+                        <div class="service-footer">
+                            <button class="service-btn">修改</button>
+                            <button class="service-btn" style="background: var(--primary);">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 頁腳 -->
+    <footer>
+        <p>&copy; 2023 康怡中醫診療中心. 保留所有權利.</p>
+        <p>地址: 台北市大安區仁愛路四段100號 | 電話: 02-2700-0000</p>
+    </footer>
+
+    <script>
+        // 頁面加載完成後執行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 為日曆日期添加點擊效果
+            const calendarDays = document.querySelectorAll('.calendar-day');
+            calendarDays.forEach(day => {
+                day.addEventListener('click', function() {
+                    calendarDays.forEach(d => d.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // 為時間段添加點擊效果
+            const timeSlots = document.querySelectorAll('.time-slot');
+            timeSlots.forEach(slot => {
+                slot.addEventListener('click', function() {
+                    timeSlots.forEach(s => s.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // 確認預約按鈕效果
+            const confirmBtn = document.getElementById('confirm-booking');
+            confirmBtn.addEventListener('click', function() {
+                this.textContent = '預約中...';
+                this.style.background = 'var(--accent)';
+                
+                setTimeout(() => {
+                    alert('預約成功！我們已向您的郵箱發送了確認信息。');
+                    this.textContent = '預約成功！';
+                    this.style.background = 'var(--secondary)';
+                    
+                    // 重置按鈕狀態
+                    setTimeout(() => {
+                        this.textContent = '確認預約';
+                        this.style.background = '';
+                    }, 2000);
+                }, 1500);
+            });
+            
+            // 服務按鈕懸停效果
+            const serviceBtns = document.querySelectorAll('.service-btn');
+            serviceBtns.forEach(btn => {
+                btn.addEventListener('mouseover', function() {
+                    this.style.transform = 'scale(1.05)';
+                });
+                
+                btn.addEventListener('mouseout', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+
+        // 選擇服務函數
+        function selectService(serviceId) {
+            // 檢查用戶是否登錄
+            if (!isLoggedIn()) {
+                alert('請先登錄以預約服務');
+                return;
+            }
+            
+            // 顯示成功選擇動畫
+            const serviceBtn = event.target;
+            serviceBtn.textContent = '已選擇 ✓';
+            serviceBtn.style.background = 'var(--secondary)';
+            
+            // 滾動到預約區域
+            scrollToBooking();
+        }
+        
+        // 滾動到預約區域
+        function scrollToBooking() {
+            document.getElementById('booking').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+        
+        // 模擬登錄功能
+        function login() {
+            document.getElementById('auth-forms').style.display = 'none';
+            document.getElementById('booking-form').style.display = 'block';
+            document.getElementById('login-link').style.display = 'none';
+            document.getElementById('account-link').style.display = 'block';
+            document.getElementById('account').style.display = 'block';
+            
+            // 顯示登錄成功消息
+            const loginMsg = document.createElement('div');
+            loginMsg.textContent = '登錄成功！';
+            loginMsg.style.background = 'var(--secondary)';
+            loginMsg.style.color = 'white';
+            loginMsg.style.padding = '1rem';
+            loginMsg.style.borderRadius = '8px';
+            loginMsg.style.marginBottom = '1rem';
+            loginMsg.style.textAlign = 'center';
+            
+            document.getElementById('booking').prepend(loginMsg);
+            
+            // 3秒後消失
+            setTimeout(() => {
+                loginMsg.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 檢查登錄狀態（模擬）
+        function isLoggedIn() {
+            return document.getElementById('booking-form').style.display === 'block';
+        }
+    </script>
+</body>
+</html>
