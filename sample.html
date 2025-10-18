@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>現代智能中醫中心預約系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Noto Sans TC", sans-serif;
+      }
+      .step-indicator {
+        transition: all 0.3s ease;
+      }
+      .service-card,
+      .time-slot {
+        transition: all 0.2s ease;
+      }
+      .service-card:hover {
+        transform: translateY(-2px);
+      }
+      .time-slot:hover {
+        transform: scale(1.02);
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-slate-50 to-slate-100 text-slate-800">
+    <div id="app" class="min-h-screen">
+      <!-- 登入頁面 -->
+      <div v-if="!currentMember" class="max-w-md mx-auto py-12 px-4">
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <div class="text-center mb-8">
+            <i class="fas fa-leaf text-emerald-500 text-5xl mb-4"></i>
+            <h1 class="text-2xl font-bold text-emerald-700">
+              現代智能中醫中心
+            </h1>
+            <p class="text-slate-500 mt-2">會員登入系統</p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2"
+                >手機號碼</label
+              >
+              <input
+                type="tel"
+                v-model="loginPhone"
+                placeholder="請輸入您的手機號碼"
+                class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+            <button
+              @click="handleLogin"
+              class="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+            >
+              登入系統
+            </button>
+            <div
+              class="text-center text-sm text-slate-500 pt-4 border-t border-slate-200"
+            >
+              <p>示範帳號：0912-345-678 或 0933-456-789</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white rounded-xl p-4 text-center shadow">
+            <i class="fas fa-calendar-check text-emerald-500 text-2xl mb-2"></i>
+            <h3 class="font-semibold text-emerald-700">智能預約</h3>
+            <p class="text-xs text-slate-500 mt-1">即時查看醫師與床位狀況</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 text-center shadow">
+            <i class="fab fa-whatsapp text-emerald-500 text-2xl mb-2"></i>
+            <h3 class="font-semibold text-emerald-700">即時通知</h3>
+            <p class="text-xs text-slate-500 mt-1">WhatsApp 預約確認與提醒</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 text-center shadow">
+            <i class="fas fa-user-clock text-emerald-500 text-2xl mb-2"></i>
+            <h3 class="font-semibold text-emerald-700">會員專屬</h3>
+            <p class="text-xs text-slate-500 mt-1">線上修改與取消預約</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主系統頁面 -->
+      <div v-else class="max-w-7xl mx-auto px-4 py-6">
+        <!-- 頂部導航 -->
+        <header
+          class="flex flex-col md:flex-row justify-between items-center mb-8 pb-4 border-b border-slate-200"
+        >
+          <div class="flex items-center mb-4 md:mb-0">
+            <i class="fas fa-leaf text-emerald-500 text-3xl mr-3"></i>
+            <div>
+              <h1 class="text-2xl font-bold text-emerald-700">
+                現代智能中醫中心預約系統
+              </h1>
+              <p class="text-sm text-slate-500">
+                智慧預約 · WhatsApp通知 · 會員專屬管理
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row items-center gap-4">
+            <div class="bg-emerald-50 px-4 py-2 rounded-full">
+              <span class="text-emerald-700 font-medium">
+                <i class="fas fa-user-circle mr-2"></i>
+                {{ currentMember.name }} ({{ currentMember.memberLevel }})
+              </span>
+            </div>
+            <div class="flex gap-2">
+              <button
+                @click="setView('booking')"
+                :class="view === 'booking' ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                class="px-4 py-2 rounded-lg transition-colors"
+              >
+                <i class="fas fa-calendar-plus mr-2"></i>預約服務
+              </button>
+              <button
+                @click="setView('myBookings')"
+                :class="view === 'myBookings' ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                class="px-4 py-2 rounded-lg transition-colors"
+              >
+                <i class="fas fa-history mr-2"></i>我的預約
+              </button>
+              <button
+                @click="handleLogout"
+                class="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300 transition-colors"
+              >
+                <i class="fas fa-sign-out-alt mr-2"></i>登出
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- 主要內容區域 -->
+          <section class="lg:col-span-2">
+            <!-- 我的預約頁面 -->
+            <div
+              v-if="view === 'myBookings'"
+              class="bg-white rounded-2xl shadow-lg p-6"
+            >
+              <h2
+                class="text-xl font-semibold mb-6 text-emerald-700 flex items-center"
+              >
+                <i class="fas fa-history mr-2"></i>我的預約記錄
+              </h2>
+
+              <div
+                v-if="myBookings.length === 0"
+                class="text-center py-12 text-slate-500"
+              >
+                <i
+                  class="fas fa-calendar-times text-4xl mb-4 text-slate-300"
+                ></i>
+                <p class="text-lg mb-4">尚無預約記錄</p>
+                <button
+                  @click="setView('booking')"
+                  class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                >
+                  <i class="fas fa-calendar-plus mr-2"></i>立即預約
+                </button>
+              </div>
+
+              <div v-else class="space-y-4">
+                <div
+                  v-for="booking in myBookings"
+                  :key="booking.id"
+                  class="border border-slate-200 rounded-xl p-4 hover:shadow-md transition-shadow"
+                >
+                  <div
+                    class="flex flex-col md:flex-row justify-between items-start"
+                  >
+                    <div class="flex-1">
+                      <div class="flex items-start">
+                        <div
+                          class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-medium mb-2"
+                        >
+                          {{ getService(booking.serviceId).name }}
+                        </div>
+                        <span
+                          class="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                        >
+                          {{ getDoctor(booking.doctorId).specialty }}
+                        </span>
+                      </div>
+
+                      <div class="flex flex-wrap gap-4 mt-2">
+                        <div class="flex items-center text-slate-600">
+                          <i class="fas fa-user-md mr-2 text-emerald-500"></i>
+                          {{ getDoctor(booking.doctorId).name }}
+                        </div>
+                        <div class="flex items-center text-slate-600">
+                          <i class="fas fa-clock mr-2 text-emerald-500"></i>
+                          {{ formatDate(booking.start) }} {{
+                          formatShort(booking.start) }}
+                        </div>
+                        <div class="flex items-center text-slate-600">
+                          <i
+                            class="fas fa-money-bill-wave mr-2 text-emerald-500"
+                          ></i>
+                          NT$ {{ getService(booking.serviceId).price }}
+                        </div>
+                      </div>
+
+                      <div
+                        v-if="booking.notes"
+                        class="mt-3 p-3 bg-slate-50 rounded-lg"
+                      >
+                        <p class="text-sm text-slate-700">
+                          <i
+                            class="fas fa-sticky-note mr-2 text-emerald-500"
+                          ></i>
+                          {{ booking.notes }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="flex gap-2 mt-4 md:mt-0">
+                      <button
+                        @click="startEditBooking(booking)"
+                        class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <i class="fas fa-edit mr-1"></i>更改
+                      </button>
+                      <button
+                        @click="cancelBooking(booking.id)"
+                        class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        <i class="fas fa-times mr-1"></i>取消
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 預約流程 -->
+            <div
+              v-if="view === 'booking'"
+              class="bg-white rounded-2xl shadow-lg p-6"
+            >
+              <!-- 步驟指示器 -->
+              <div class="mb-8 flex justify-center">
+                <div class="flex items-center gap-2 text-sm text-slate-500">
+                  <div class="step-indicator flex flex-col items-center">
+                    <span
+                      :class="step >= 1 ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                      class="w-10 h-10 rounded-full flex items-center justify-center font-medium"
+                    >
+                      1
+                    </span>
+                    <span class="text-xs mt-1">選服務</span>
+                  </div>
+                  <div
+                    class="w-12 h-1"
+                    :class="step >= 2 ? 'bg-emerald-600' : 'bg-slate-200'"
+                  ></div>
+                  <div class="step-indicator flex flex-col items-center">
+                    <span
+                      :class="step >= 2 ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                      class="w-10 h-10 rounded-full flex items-center justify-center font-medium"
+                    >
+                      2
+                    </span>
+                    <span class="text-xs mt-1">選時間</span>
+                  </div>
+                  <div
+                    class="w-12 h-1"
+                    :class="step >= 3 ? 'bg-emerald-600' : 'bg-slate-200'"
+                  ></div>
+                  <div class="step-indicator flex flex-col items-center">
+                    <span
+                      :class="step >= 3 ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                      class="w-10 h-10 rounded-full flex items-center justify-center font-medium"
+                    >
+                      3
+                    </span>
+                    <span class="text-xs mt-1">資料</span>
+                  </div>
+                  <div
+                    class="w-12 h-1"
+                    :class="step === 4 ? 'bg-emerald-600' : 'bg-slate-200'"
+                  ></div>
+                  <div class="step-indicator flex flex-col items-center">
+                    <span
+                      :class="step === 4 ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                      class="w-10 h-10 rounded-full flex items-center justify-center font-medium"
+                    >
+                      <i class="fas fa-check"></i>
+                    </span>
+                    <span class="text-xs mt-1">完成</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 步驟1: 選擇服務 -->
+              <div v-if="step === 1">
+                <h2
+                  class="text-xl font-semibold mb-6 text-emerald-700 flex items-center"
+                >
+                  <i class="fas fa-concierge-bell mr-2"></i>請選擇治療服務
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div
+                    v-for="service in SERVICES"
+                    :key="service.id"
+                    @click="selectService(service.id)"
+                    :class="selectedService === service.id ? 
+                                            'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-300' : 
+                                            'border-slate-200 hover:border-emerald-400'"
+                    class="service-card border-2 rounded-xl p-5 cursor-pointer transition-all"
+                  >
+                    <div class="font-semibold text-lg mb-2">
+                      {{ service.name }}
+                    </div>
+                    <div class="text-slate-600 text-sm mb-3">
+                      {{ service.short }}
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-emerald-700 font-bold"
+                        >NT$ {{ service.price }}</span
+                      >
+                      <span
+                        class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded"
+                      >
+                        {{ service.duration }} 分鐘
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 步驟2: 選擇時間 -->
+              <div v-if="step === 2">
+                <h2
+                  class="text-xl font-semibold mb-6 text-emerald-700 flex items-center"
+                >
+                  <i class="far fa-clock mr-2"></i>
+                  {{ editingBooking ? '修改預約時間' : '選擇日期、時間與醫師' }}
+                </h2>
+
+                <div
+                  class="flex flex-col md:flex-row gap-4 items-start md:items-center mb-6 p-4 bg-slate-50 rounded-lg"
+                >
+                  <div class="flex-1">
+                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                      >預約日期</label
+                    >
+                    <input
+                      type="date"
+                      v-model="selectedDate"
+                      class="w-full border border-slate-300 p-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  </div>
+                  <div class="flex-1">
+                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                      >指定醫師</label
+                    >
+                    <select
+                      v-model="selectedDoctor"
+                      class="w-full border border-slate-300 p-2 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    >
+                      <option value="any">任何可用醫師</option>
+                      <option
+                        v-for="doctor in DOCTORS"
+                        :key="doctor.id"
+                        :value="doctor.id"
+                      >
+                        {{ doctor.name }} - {{ doctor.specialty }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mb-6">
+                  <h3
+                    class="text-lg font-medium text-slate-700 mb-3 flex items-center"
+                  >
+                    <i class="fas fa-calendar-day mr-2 text-emerald-500"></i
+                    >可預約時段
+                  </h3>
+                  <div
+                    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-96 overflow-y-auto p-2"
+                  >
+                    <div
+                      v-for="slot in timeslots"
+                      :key="slot.startIso"
+                      @click="slot.available && setSelectedTime(slot)"
+                      :class="[
+                                            slot.available ? 
+                                                'hover:bg-emerald-50 hover:border-emerald-400 cursor-pointer' : 
+                                                'opacity-50 cursor-not-allowed',
+                                            selectedTime?.startIso === slot.startIso ? 
+                                                'ring-2 ring-emerald-300 bg-emerald-50 border-emerald-400' : 
+                                                'border-slate-200'
+                                        ]"
+                      class="time-slot border rounded-lg p-3 text-center transition-all"
+                    >
+                      <div class="font-medium text-sm">
+                        {{ formatShort(slot.startIso) }}
+                      </div>
+                      <div class="text-xs text-slate-500 mt-1">
+                        {{ formatShort(slot.endIso) }}
+                      </div>
+                      <div
+                        class="mt-2 text-xs font-medium"
+                        :class="slot.available ? 'text-emerald-600' : 'text-red-500'"
+                      >
+                        {{ slot.available ? '可預約' : '已滿' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="flex justify-between items-center pt-4 border-t border-slate-200"
+                >
+                  <button
+                    @click="editingBooking ? cancelEdit() : step = 1"
+                    class="px-6 py-2 bg-slate-200 rounded-lg hover:bg-slate-300 transition-colors flex items-center"
+                  >
+                    <i class="fas fa-arrow-left mr-2"></i>上一步
+                  </button>
+                  <button
+                    @click="validateAndProceed"
+                    :disabled="!selectedTime"
+                    :class="selectedTime ? 
+                                           'bg-emerald-600 hover:bg-emerald-700' : 
+                                           'bg-slate-300 cursor-not-allowed'"
+                    class="px-6 py-2 text-white rounded-lg transition-colors flex items-center"
+                  >
+                    {{ editingBooking ? '確認修改' : '下一步' }}
+                    <i class="fas fa-arrow-right ml-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 步驟3: 聯絡資料 -->
+              <div v-if="step === 3">
+                <h2
+                  class="text-xl font-semibold mb-6 text-emerald-700 flex items-center"
+                >
+                  <i class="fas fa-user-edit mr-2"></i>確認聯絡資料
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                      >姓名</label
+                    >
+                    <input
+                      v-model="customerName"
+                      class="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                      >電話</label
+                    >
+                    <input
+                      v-model="customerPhone"
+                      class="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-700 mb-1"
+                      >電子郵件</label
+                    >
+                    <input
+                      v-model="customerEmail"
+                      type="email"
+                      class="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  </div>
+                  <div class="md:col-span-2">
+                    <label
+                      class="block text-sm font-medium text-slate-700 mb-1"
+                    >
+                      <i class="fas fa-sticky-note mr-2"></i
+                      >備註（症狀描述或特殊需求）
+                    </label>
+                    <textarea
+                      v-model="customerNotes"
+                      rows="3"
+                      class="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="請描述您的主要症狀或特殊需求..."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div
+                  class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200"
+                >
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      v-model="sendWhatsApp"
+                      class="mr-3 h-5 w-5 text-emerald-600 rounded focus:ring-emerald-500"
+                    />
+                    <div>
+                      <span class="font-medium text-blue-800"
+                        >發送 WhatsApp 預約確認通知</span
+                      >
+                      <p class="text-sm text-blue-600 mt-1">
+                        我們將透過 WhatsApp
+                        發送預約確認訊息與提醒，讓您不會錯過預約時間。
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                <div
+                  class="flex justify-between items-center pt-4 border-t border-slate-200"
+                >
+                  <button
+                    @click="step = 2"
+                    class="px-6 py-2 bg-slate-200 rounded-lg hover:bg-slate-300 transition-colors flex items-center"
+                  >
+                    <i class="fas fa-arrow-left mr-2"></i>上一步
+                  </button>
+                  <button
+                    @click="editingBooking ? updateBooking() : reserve()"
+                    class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center"
+                  >
+                    <i class="fas fa-calendar-check mr-2"></i>
+                    {{ editingBooking ? '確認修改預約' : '確認預約' }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- 步驟4: 完成 -->
+              <div v-if="step === 4" class="text-center py-8">
+                <div
+                  class="bg-emerald-50 border border-emerald-200 rounded-2xl p-8 max-w-md mx-auto"
+                >
+                  <div class="text-5xl text-emerald-500 mb-4">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <h2 class="text-2xl font-semibold text-emerald-700 mb-4">
+                    預約完成！
+                  </h2>
+                  <p class="text-slate-700 mb-6 whitespace-pre-line">
+                    {{ result?.msg }}
+                  </p>
+
+                  <div
+                    v-if="sendWhatsApp"
+                    class="mb-6 p-3 bg-green-50 rounded-lg border border-green-200"
+                  >
+                    <div
+                      class="flex items-center justify-center text-green-700"
+                    >
+                      <i class="fab fa-whatsapp text-xl mr-2"></i>
+                      <span class="font-medium"
+                        >WhatsApp 通知已發送至您的手機</span
+                      >
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button
+                      class="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center"
+                      @click="resetBooking"
+                    >
+                      <i class="fas fa-plus-circle mr-2"></i>繼續預約
+                    </button>
+                    <button
+                      class="px-6 py-3 bg-slate-200 rounded-lg hover:bg-slate-300 transition-colors flex items-center justify-center"
+                      @click="setView('myBookings')"
+                    >
+                      <i class="fas fa-history mr-2"></i>查看我的預約
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 側邊欄 -->
+          <aside class="space-y-6">
+            <!-- 即時預約狀況 -->
+            <div class="bg-white rounded-2xl shadow-lg p-5">
+              <h3 class="font-semibold text-emerald-700 mb-4 flex items-center">
+                <i class="fas fa-binoculars mr-2"></i>即時預約狀況
+              </h3>
+              <div class="space-y-3">
+                <div
+                  v-for="booking in recentBookings"
+                  :key="booking.id"
+                  class="flex items-center p-3 bg-slate-50 rounded-lg"
+                >
+                  <div
+                    class="flex-shrink-0 w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600"
+                  >
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                  <div class="ml-3 flex-1">
+                    <div class="font-medium text-sm">
+                      {{ getDoctor(booking.doctorId).name }}
+                    </div>
+                    <div class="text-xs text-slate-500">
+                      {{ getService(booking.serviceId).short }}
+                    </div>
+                  </div>
+                  <div class="text-xs font-medium text-emerald-600">
+                    {{ formatShort(booking.start) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 診所概況 -->
+            <div class="bg-white rounded-2xl shadow-lg p-5">
+              <h4 class="font-semibold text-emerald-700 mb-4 flex items-center">
+                <i class="fas fa-clinic-medical mr-2"></i>診所概況
+              </h4>
+              <div class="space-y-3">
+                <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                  <div
+                    class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"
+                  >
+                    <i class="fas fa-bed"></i>
+                  </div>
+                  <div class="ml-3">
+                    <div class="font-medium">推拿治療床</div>
+                    <div class="text-sm text-slate-600">
+                      {{ TOTAL_BEDS.tuina }} 張可用
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                  <div
+                    class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600"
+                  >
+                    <i class="fas fa-procedures"></i>
+                  </div>
+                  <div class="ml-3">
+                    <div class="font-medium">針灸治療床</div>
+                    <div class="text-sm text-slate-600">
+                      {{ TOTAL_BEDS.acup }} 張可用
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                  <div
+                    class="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600"
+                  >
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                  <div class="ml-3">
+                    <div class="font-medium">專業醫師</div>
+                    <div class="text-sm text-slate-600">
+                      {{ DOCTORS.length }} 位服務中
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200"
+              >
+                <p class="text-xs text-amber-700">
+                  <i class="fas fa-lightbulb mr-1"></i>
+                  <strong>系統特色：</strong><br />
+                  • WhatsApp 即時通知<br />
+                  • 會員專屬管理<br />
+                  • 線上修改預約<br />
+                  • 智能床位分配
+                </p>
+              </div>
+            </div>
+          </aside>
+        </main>
+
+        <footer
+          class="text-center text-sm text-slate-500 mt-8 pt-6 border-t border-slate-200"
+        >
+          <p>© 2025 智能中醫診所預約系統 | 服務專線：02-1234-5678</p>
+        </footer>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script>
+      const { createApp, ref, computed, onMounted } = Vue;
+
+      createApp({
+        setup() {
+          // 資料定義
+          const DOCTORS = [
+            { id: "d1", name: "陳醫師", specialty: "推拿專家" },
+            { id: "d2", name: "李醫師", specialty: "針灸專家" },
+            { id: "d3", name: "黃醫師", specialty: "綜合治療" },
+            { id: "d4", name: "何醫師", specialty: "內科調理" },
+          ];
+
+          const SERVICES = [
+            {
+              id: "s1",
+              name: "推拿治療（45 分鐘）",
+              short: "推拿 45m",
+              bedType: "tuina",
+              duration: 45,
+              price: 600,
+            },
+            {
+              id: "s2",
+              name: "針灸治療（30 分鐘）",
+              short: "針灸 30m",
+              bedType: "acup",
+              duration: 30,
+              price: 500,
+            },
+            {
+              id: "s3",
+              name: "推拿 + 針灸（60 分鐘）",
+              short: "推 + 針 60m",
+              bedType: "mixed",
+              duration: 60,
+              price: 1000,
+            },
+          ];
+
+          const TOTAL_BEDS = { tuina: 5, acup: 5 };
+
+          const MEMBERS = [
+            {
+              id: "m1",
+              name: "張三",
+              phone: "0912-345-678",
+              email: "zhang@example.com",
+              memberLevel: "黃金會員",
+            },
+            {
+              id: "m2",
+              name: "李四",
+              phone: "0933-456-789",
+              email: "li@example.com",
+              memberLevel: "白銀會員",
+            },
+          ];
+
+          // 初始預約資料
+          const initialBookings = [
+            {
+              id: "b1",
+              memberId: "m1",
+              doctorId: "d1",
+              serviceId: "s1",
+              start: "2025-10-20T09:00:00",
+              end: "2025-10-20T09:45:00",
+              status: "confirmed",
+              customerName: "張三",
+              customerPhone: "0912-345-678",
+              customerEmail: "zhang@example.com",
+              notes: "肩頸痠痛",
+            },
+            {
+              id: "b2",
+              memberId: "m2",
+              doctorId: "d2",
+              serviceId: "s2",
+              start: "2025-10-20T09:30:00",
+              end: "2025-10-20T10:00:00",
+              status: "confirmed",
+              customerName: "李四",
+              customerPhone: "0933-456-789",
+              customerEmail: "li@example.com",
+              notes: "腰痛治療",
+            },
+            {
+              id: "b3",
+              memberId: "m1",
+              doctorId: "d3",
+              serviceId: "s3",
+              start: "2025-10-20T14:00:00",
+              end: "2025-10-20T15:00:00",
+              status: "confirmed",
+              customerName: "張三",
+              customerPhone: "0912-345-678",
+              customerEmail: "zhang@example.com",
+              notes: "長期疲勞與失眠",
+            },
+          ];
+
+          // 狀態變數
+          const bookings = ref(initialBookings);
+          const step = ref(0); // 0: 登入, 1: 選服務, 2: 選時間, 3: 聯絡資料, 4: 完成
+          const selectedService = ref(SERVICES[0].id);
+          const selectedDoctor = ref("any");
+          const selectedDate = ref("2025-10-20");
+          const selectedTime = ref(null);
+          const customerName = ref("");
+          const customerPhone = ref("");
+          const customerEmail = ref("");
+          const customerNotes = ref("");
+          const result = ref(null);
+          const currentMember = ref(null);
+          const view = ref("booking");
+          const editingBooking = ref(null);
+          const loginPhone = ref("");
+          const sendWhatsApp = ref(true);
+
+          // 計算屬性
+          const timeslots = computed(() => {
+            const svc = SERVICES.find((s) => s.id === selectedService.value);
+            const startDay = new Date(`${selectedDate.value}T09:00:00`);
+            const endDay = new Date(`${selectedDate.value}T18:00:00`);
+            const slots = [];
+
+            for (
+              let t = new Date(startDay);
+              t < endDay;
+              t.setMinutes(t.getMinutes() + 15)
+            ) {
+              const startIso = t.toISOString().slice(0, 16);
+              const endIso = addMinutes(startIso, svc.duration);
+              const overlap = bookings.value.filter(
+                (b) =>
+                  b.start < endIso &&
+                  b.end > startIso &&
+                  b.status !== "cancelled"
+              );
+              const doctorBusy =
+                selectedDoctor.value !== "any" &&
+                overlap.some((b) => b.doctorId === selectedDoctor.value);
+              const available = overlap.length < 3 && !doctorBusy;
+              slots.push({ startIso, endIso, available });
+            }
+            return slots;
+          });
+
+          const myBookings = computed(() => {
+            return bookings.value.filter(
+              (b) =>
+                b.memberId === currentMember.value?.id &&
+                b.status !== "cancelled"
+            );
+          });
+
+          const recentBookings = computed(() => {
+            return bookings.value
+              .filter((b) => b.status !== "cancelled")
+              .sort((a, b) => new Date(a.start) - new Date(b.start))
+              .slice(0, 5);
+          });
+
+          // 工具函數
+          const addMinutes = (iso, mins) => {
+            return new Date(new Date(iso).getTime() + mins * 60000)
+              .toISOString()
+              .slice(0, 16);
+          };
+
+          const formatShort = (dtIso) => {
+            const d = new Date(dtIso);
+            return d.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+          };
+
+          const formatDate = (dtIso) => {
+            const d = new Date(dtIso);
+            return d.toLocaleDateString("zh-TW", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            });
+          };
+
+          const getService = (serviceId) => {
+            return SERVICES.find((s) => s.id === serviceId);
+          };
+
+          const getDoctor = (doctorId) => {
+            return DOCTORS.find((d) => d.id === doctorId);
+          };
+
+          // 登入功能
+          const handleLogin = () => {
+            const member = MEMBERS.find((m) => m.phone === loginPhone.value);
+            if (member) {
+              currentMember.value = member;
+              customerName.value = member.name;
+              customerPhone.value = member.phone;
+              customerEmail.value = member.email;
+              step.value = 1;
+            } else {
+              alert("找不到該電話號碼的會員，請確認或註冊新會員");
+            }
+          };
+
+          // 登出功能
+          const handleLogout = () => {
+            currentMember.value = null;
+            step.value = 0;
+            loginPhone.value = "";
+            view.value = "booking";
+            resetBooking();
+          };
+
+          // 設定視圖
+          const setView = (newView) => {
+            view.value = newView;
+            if (newView === "booking") {
+              resetBooking();
+            }
+          };
+
+          // 選擇服務
+          const selectService = (serviceId) => {
+            selectedService.value = serviceId;
+            step.value = 2;
+          };
+
+          // 設定選擇時間
+          const setSelectedTime = (slot) => {
+            selectedTime.value = slot;
+          };
+
+          // 驗證並繼續
+          const validateAndProceed = () => {
+            if (!selectedTime.value) {
+              alert("請選擇時段");
+              return;
+            }
+            step.value = 3;
+          };
+
+          // 模擬發送 WhatsApp 通知
+          const sendWhatsAppNotification = (booking) => {
+            const service = SERVICES.find((s) => s.id === booking.serviceId);
+            const doctor = DOCTORS.find((d) => d.id === booking.doctorId);
+            const message = `📅 預約確認通知\n\n親愛的 ${
+              booking.customerName
+            }，\n您已成功預約 ${formatDate(booking.start)} ${formatShort(
+              booking.start
+            )} 的 ${service.name}，由 ${
+              doctor.name
+            } 為您服務。\n\n📍 現代智能中醫中心\n📞 服務專線：02-1234-5678`;
+
+            console.log("WhatsApp 通知已發送:", message);
+            alert(
+              `📱 WhatsApp 通知已發送至 ${booking.customerPhone}\n\n${message}`
+            );
+          };
+
+          // 預約功能
+          const reserve = () => {
+            if (!selectedTime.value) return alert("請選擇時段");
+            const svc = SERVICES.find((s) => s.id === selectedService.value);
+            const doctor =
+              selectedDoctor.value === "any"
+                ? DOCTORS[Math.floor(Math.random() * DOCTORS.length)].id
+                : selectedDoctor.value;
+
+            const newBooking = {
+              id: "b" + (bookings.value.length + 1),
+              memberId: currentMember.value?.id,
+              doctorId: doctor,
+              serviceId: svc.id,
+              start: selectedTime.value.startIso,
+              end: selectedTime.value.endIso,
+              status: "confirmed",
+              customerName: customerName.value,
+              customerPhone: customerPhone.value,
+              customerEmail: customerEmail.value,
+              notes: customerNotes.value,
+            };
+
+            bookings.value.push(newBooking);
+
+            if (sendWhatsApp.value) {
+              sendWhatsAppNotification(newBooking);
+            }
+
+            result.value = {
+              success: true,
+              msg: `✅ 預約成功！\n${svc.name}\n醫師：${
+                DOCTORS.find((d) => d.id === doctor).name
+              }\n時間：${formatDate(selectedTime.value.startIso)} ${formatShort(
+                selectedTime.value.startIso
+              )}`,
+            };
+            step.value = 4;
+          };
+
+          // 取消預約
+          const cancelBooking = (bookingId) => {
+            if (confirm("確定要取消這個預約嗎？")) {
+              bookings.value = bookings.value.map((b) =>
+                b.id === bookingId ? { ...b, status: "cancelled" } : b
+              );
+              alert("預約已取消");
+            }
+          };
+
+          // 開始修改預約
+          const startEditBooking = (booking) => {
+            editingBooking.value = booking;
+            selectedService.value = booking.serviceId;
+            selectedDoctor.value = booking.doctorId;
+            selectedDate.value = booking.start.slice(0, 10);
+            view.value = "booking";
+            step.value = 2;
+          };
+
+          // 取消編輯
+          const cancelEdit = () => {
+            editingBooking.value = null;
+            resetBooking();
+            view.value = "myBookings";
+          };
+
+          // 更新預約
+          const updateBooking = () => {
+            if (!selectedTime.value) return alert("請選擇時段");
+            const svc = SERVICES.find((s) => s.id === selectedService.value);
+            const doctor =
+              selectedDoctor.value === "any"
+                ? DOCTORS[Math.floor(Math.random() * DOCTORS.length)].id
+                : selectedDoctor.value;
+
+            bookings.value = bookings.value.map((b) =>
+              b.id === editingBooking.value.id
+                ? {
+                    ...b,
+                    doctorId: doctor,
+                    serviceId: svc.id,
+                    start: selectedTime.value.startIso,
+                    end: selectedTime.value.endIso,
+                    customerName: customerName.value,
+                    customerPhone: customerPhone.value,
+                    customerEmail: customerEmail.value,
+                    notes: customerNotes.value,
+                  }
+                : b
+            );
+
+            if (sendWhatsApp.value) {
+              sendWhatsAppNotification({
+                ...editingBooking.value,
+                doctorId: doctor,
+                serviceId: svc.id,
+                start: selectedTime.value.startIso,
+                end: selectedTime.value.endIso,
+                customerName: customerName.value,
+                customerPhone: customerPhone.value,
+              });
+            }
+
+            result.value = {
+              success: true,
+              msg: `✅ 預約已更新！\n${svc.name}\n醫師：${
+                DOCTORS.find((d) => d.id === doctor).name
+              }\n時間：${formatDate(selectedTime.value.startIso)} ${formatShort(
+                selectedTime.value.startIso
+              )}`,
+            };
+            editingBooking.value = null;
+            step.value = 4;
+          };
+
+          // 重置預約表單
+          const resetBooking = () => {
+            step.value = 1;
+            selectedService.value = SERVICES[0].id;
+            selectedDoctor.value = "any";
+            selectedDate.value = "2025-10-20";
+            selectedTime.value = null;
+            customerNotes.value = "";
+            result.value = null;
+            editingBooking.value = null;
+
+            // 保留會員資料
+            if (currentMember.value) {
+              customerName.value = currentMember.value.name;
+              customerPhone.value = currentMember.value.phone;
+              customerEmail.value = currentMember.value.email;
+            }
+          };
+
+          // 初始化
+          onMounted(() => {
+            // 設置預設值
+            selectedDate.value = new Date().toISOString().slice(0, 10);
+          });
+
+          return {
+            DOCTORS,
+            SERVICES,
+            TOTAL_BEDS,
+            MEMBERS,
+            bookings,
+            step,
+            selectedService,
+            selectedDoctor,
+            selectedDate,
+            selectedTime,
+            customerName,
+            customerPhone,
+            customerEmail,
+            customerNotes,
+            result,
+            currentMember,
+            view,
+            editingBooking,
+            loginPhone,
+            sendWhatsApp,
+            timeslots,
+            myBookings,
+            recentBookings,
+            handleLogin,
+            handleLogout,
+            setView,
+            selectService,
+            setSelectedTime,
+            validateAndProceed,
+            reserve,
+            cancelBooking,
+            startEditBooking,
+            cancelEdit,
+            updateBooking,
+            resetBooking,
+            addMinutes,
+            formatShort,
+            formatDate,
+            getService,
+            getDoctor,
+            sendWhatsAppNotification,
+          };
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
