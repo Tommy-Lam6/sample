@@ -27,6 +27,17 @@
       .time-slot:hover {
         transform: scale(1.02);
       }
+      .fade-enter-active,
+      .fade-leave-active {
+        transition: opacity 0.5s;
+      }
+      .fade-enter,
+      .fade-leave-to {
+        opacity: 0;
+      }
+      .ai-recommendation {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      }
     </style>
   </head>
   <body class="bg-gradient-to-br from-slate-50 to-slate-100 text-slate-800">
@@ -80,9 +91,9 @@
             <p class="text-xs text-slate-500 mt-1">WhatsApp 預約確認與提醒</p>
           </div>
           <div class="bg-white rounded-xl p-4 text-center shadow">
-            <i class="fas fa-user-clock text-emerald-500 text-2xl mb-2"></i>
-            <h3 class="font-semibold text-emerald-700">會員專屬</h3>
-            <p class="text-xs text-slate-500 mt-1">線上修改與取消預約</p>
+            <i class="fas fa-robot text-emerald-500 text-2xl mb-2"></i>
+            <h3 class="font-semibold text-emerald-700">AI推薦</h3>
+            <p class="text-xs text-slate-500 mt-1">智能症狀分析與推薦</p>
           </div>
         </div>
       </div>
@@ -100,7 +111,7 @@
                 現代智能中醫中心預約系統
               </h1>
               <p class="text-sm text-slate-500">
-                智慧預約 · WhatsApp通知 · 會員專屬管理
+                智慧預約 · WhatsApp通知 · AI智能推薦
               </p>
             </div>
           </div>
@@ -128,6 +139,13 @@
                 <i class="fas fa-history mr-2"></i>我的預約
               </button>
               <button
+                @click="setView('aiAnalysis')"
+                :class="view === 'aiAnalysis' ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                class="px-4 py-2 rounded-lg transition-colors"
+              >
+                <i class="fas fa-robot mr-2"></i>AI分析
+              </button>
+              <button
                 @click="handleLogout"
                 class="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300 transition-colors"
               >
@@ -140,6 +158,149 @@
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- 主要內容區域 -->
           <section class="lg:col-span-2">
+            <!-- AI分析頁面 -->
+            <div
+              v-if="view === 'aiAnalysis'"
+              class="bg-white rounded-2xl shadow-lg p-6"
+            >
+              <h2
+                class="text-xl font-semibold mb-6 text-emerald-700 flex items-center"
+              >
+                <i class="fas fa-robot mr-2"></i>AI智能症狀分析與推薦
+              </h2>
+
+              <div class="mb-6 p-4 ai-recommendation rounded-xl">
+                <h3 class="font-semibold text-blue-700 mb-2 flex items-center">
+                  <i class="fas fa-lightbulb mr-2"></i>AI推薦服務
+                </h3>
+                <p class="text-sm text-blue-600 mb-3">
+                  根據您過往的預約記錄和症狀描述，AI為您推薦以下服務：
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div
+                    v-for="service in aiRecommendations"
+                    :key="service.id"
+                    class="bg-white border border-blue-200 rounded-lg p-3 flex items-start"
+                  >
+                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                      <i :class="service.icon" class="text-blue-600"></i>
+                    </div>
+                    <div>
+                      <div class="font-medium text-blue-800">
+                        {{ service.name }}
+                      </div>
+                      <div class="text-xs text-blue-600 mt-1">
+                        {{ service.reason }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-6">
+                <h3 class="font-semibold text-slate-700 mb-3 flex items-center">
+                  <i class="fas fa-chart-line mr-2 text-emerald-500"></i
+                  >您的健康趨勢分析
+                </h3>
+                <div class="bg-slate-50 p-4 rounded-lg">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium">肩頸問題</span>
+                    <span
+                      class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full"
+                      >改善中</span
+                    >
+                  </div>
+                  <div class="w-full bg-slate-200 rounded-full h-2 mb-4">
+                    <div
+                      class="bg-orange-500 h-2 rounded-full"
+                      style="width: 70%"
+                    ></div>
+                  </div>
+
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium">腰痛問題</span>
+                    <span
+                      class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full"
+                      >已改善</span
+                    >
+                  </div>
+                  <div class="w-full bg-slate-200 rounded-full h-2 mb-4">
+                    <div
+                      class="bg-green-500 h-2 rounded-full"
+                      style="width: 90%"
+                    ></div>
+                  </div>
+
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium">睡眠品質</span>
+                    <span
+                      class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
+                      >穩定</span
+                    >
+                  </div>
+                  <div class="w-full bg-slate-200 rounded-full h-2">
+                    <div
+                      class="bg-blue-500 h-2 rounded-full"
+                      style="width: 60%"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="font-semibold text-slate-700 mb-3 flex items-center">
+                  <i class="fas fa-stethoscope mr-2 text-emerald-500"></i
+                  >症狀分析與建議
+                </h3>
+                <div class="bg-slate-50 p-4 rounded-lg">
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-2"
+                      >請描述您目前的症狀或不適：</label
+                    >
+                    <textarea
+                      v-model="symptomDescription"
+                      rows="3"
+                      class="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="例如：最近一週頸部僵硬，右肩疼痛，影響睡眠..."
+                    ></textarea>
+                  </div>
+                  <button
+                    @click="analyzeSymptoms"
+                    class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center"
+                  >
+                    <i class="fas fa-search mr-2"></i>AI分析症狀
+                  </button>
+
+                  <div
+                    v-if="symptomAnalysis"
+                    class="mt-4 p-4 bg-white rounded-lg border border-emerald-200"
+                  >
+                    <h4 class="font-semibold text-emerald-700 mb-2">
+                      AI分析結果：
+                    </h4>
+                    <p class="text-sm text-slate-700 mb-3">
+                      {{ symptomAnalysis.summary }}
+                    </p>
+                    <div class="text-sm">
+                      <div class="font-medium text-slate-700 mb-1">
+                        建議治療方案：
+                      </div>
+                      <ul
+                        class="list-disc list-inside text-slate-600 space-y-1"
+                      >
+                        <li
+                          v-for="treatment in symptomAnalysis.recommendedTreatments"
+                          :key="treatment"
+                        >
+                          {{ treatment }}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- 我的預約頁面 -->
             <div
               v-if="view === 'myBookings'"
@@ -306,7 +467,31 @@
                 >
                   <i class="fas fa-concierge-bell mr-2"></i>請選擇治療服務
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                <!-- AI推薦提示 -->
+                <div
+                  v-if="aiRecommendations.length > 0"
+                  class="mb-6 p-4 ai-recommendation rounded-xl"
+                >
+                  <div class="flex items-center mb-2">
+                    <i class="fas fa-robot text-blue-600 mr-2"></i>
+                    <span class="font-medium text-blue-700"
+                      >AI為您推薦以下服務：</span
+                    >
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="service in aiRecommendations.slice(0, 2)"
+                      :key="service.id"
+                      @click="selectService(service.id)"
+                      class="px-3 py-1 bg-white border border-blue-300 text-blue-700 rounded-full text-sm hover:bg-blue-50 transition-colors"
+                    >
+                      {{ service.name }}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div
                     v-for="service in SERVICES"
                     :key="service.id"
@@ -671,7 +856,8 @@
                   • WhatsApp 即時通知<br />
                   • 會員專屬管理<br />
                   • 線上修改預約<br />
-                  • 智能床位分配
+                  • 智能床位分配<br />
+                  • AI症狀分析與推薦
                 </p>
               </div>
             </div>
@@ -724,6 +910,14 @@
               bedType: "mixed",
               duration: 60,
               price: 1000,
+            },
+            {
+              id: "s4",
+              name: "新症諮詢（30 分鐘）",
+              short: "新症諮詢 30m",
+              bedType: "none",
+              duration: 30,
+              price: 600,
             },
           ];
 
@@ -785,7 +979,7 @@
               customerName: "張三",
               customerPhone: "0912-345-678",
               customerEmail: "zhang@example.com",
-              notes: "長期疲勞與失眠",
+              notes: "長期疲勞調理",
             },
           ];
 
@@ -806,6 +1000,24 @@
           const editingBooking = ref(null);
           const loginPhone = ref("");
           const sendWhatsApp = ref(true);
+          const symptomDescription = ref("");
+          const symptomAnalysis = ref(null);
+
+          // AI推薦資料
+          const aiRecommendations = ref([
+            {
+              id: "s1",
+              name: "推拿治療",
+              reason: "根據您過往的肩頸問題",
+              icon: "fas fa-hands",
+            },
+            {
+              id: "s3",
+              name: "推拿+針灸",
+              reason: "適合您的綜合症狀",
+              icon: "fas fa-hand-holding-medical",
+            },
+          ]);
 
           // 計算屬性
           const timeslots = computed(() => {
@@ -892,6 +1104,9 @@
               customerPhone.value = member.phone;
               customerEmail.value = member.email;
               step.value = 1;
+
+              // 模擬從API獲取AI推薦
+              generateAIRecommendations();
             } else {
               alert("找不到該電話號碼的會員，請確認或註冊新會員");
             }
@@ -1087,6 +1302,77 @@
             }
           };
 
+          // AI功能
+          const generateAIRecommendations = () => {
+            // 模擬從API獲取AI推薦
+            // 這裡可以根據會員的預約歷史、症狀描述等生成推薦
+            setTimeout(() => {
+              aiRecommendations.value = [
+                {
+                  id: "s1",
+                  name: "推拿治療",
+                  reason: "根據您過往的肩頸問題",
+                  icon: "fas fa-hands",
+                },
+                {
+                  id: "s3",
+                  name: "推拿+針灸",
+                  reason: "適合您的綜合症狀",
+                  icon: "fas fa-hand-holding-medical",
+                },
+              ];
+            }, 500);
+          };
+
+          const analyzeSymptoms = () => {
+            if (!symptomDescription.value.trim()) {
+              alert("請輸入症狀描述");
+              return;
+            }
+
+            // 模擬API調用進行症狀分析
+            // 這裡可以調用實際的AI API
+            symptomAnalysis.value = null;
+
+            setTimeout(() => {
+              // 簡單的關鍵詞匹配來模擬AI分析
+              const symptoms = symptomDescription.value.toLowerCase();
+              let summary = "";
+              let treatments = [];
+
+              if (symptoms.includes("頸") || symptoms.includes("肩")) {
+                summary = "根據您的描述，您可能有肩頸肌肉緊張或勞損的問題。";
+                treatments = [
+                  "推拿治療放鬆肌肉",
+                  "針灸疏通經絡",
+                  "熱敷緩解不適",
+                ];
+              } else if (symptoms.includes("腰") || symptoms.includes("背")) {
+                summary = "您的症狀可能與腰部肌肉勞損或姿勢不良有關。";
+                treatments = [
+                  "推拿治療緩解肌肉緊張",
+                  "針灸止痛",
+                  "姿勢矯正指導",
+                ];
+              } else if (symptoms.includes("頭") || symptoms.includes("痛")) {
+                summary = "您的頭痛可能與壓力、肌肉緊張或循環問題相關。";
+                treatments = ["針灸緩解頭痛", "推拿放鬆頸部肌肉", "中藥調理"];
+              } else {
+                summary =
+                  "根據您的症狀描述，建議進行綜合評估以確定最適合的治療方案。";
+                treatments = [
+                  "新症諮詢進行全面評估",
+                  "根據評估結果制定個性化治療計劃",
+                ];
+              }
+
+              symptomAnalysis.value = {
+                summary,
+                recommendedTreatments: treatments,
+              };
+            }, 1500);
+          };
+
           // 初始化
           onMounted(() => {
             // 設置預設值
@@ -1114,6 +1400,9 @@
             editingBooking,
             loginPhone,
             sendWhatsApp,
+            symptomDescription,
+            symptomAnalysis,
+            aiRecommendations,
             timeslots,
             myBookings,
             recentBookings,
@@ -1129,6 +1418,7 @@
             cancelEdit,
             updateBooking,
             resetBooking,
+            analyzeSymptoms,
             addMinutes,
             formatShort,
             formatDate,
