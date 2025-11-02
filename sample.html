@@ -35,8 +35,18 @@
       .fade-leave-to {
         opacity: 0;
       }
-      .ai-recommendation {
+      .ai-chat-container {
         background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      }
+      .chat-message {
+        max-width: 80%;
+        word-wrap: break-word;
+      }
+      .user-message {
+        margin-left: auto;
+      }
+      .ai-message {
+        margin-right: auto;
       }
     </style>
   </head>
@@ -92,8 +102,8 @@
           </div>
           <div class="bg-white rounded-xl p-4 text-center shadow">
             <i class="fas fa-robot text-emerald-500 text-2xl mb-2"></i>
-            <h3 class="font-semibold text-emerald-700">AI推薦</h3>
-            <p class="text-xs text-slate-500 mt-1">智能症狀分析與推薦</p>
+            <h3 class="font-semibold text-emerald-700">AI客服</h3>
+            <p class="text-xs text-slate-500 mt-1">24小時智能客服支援</p>
           </div>
         </div>
       </div>
@@ -111,7 +121,7 @@
                 現代智能中醫中心預約系統
               </h1>
               <p class="text-sm text-slate-500">
-                智慧預約 · WhatsApp通知 · AI智能推薦
+                智慧預約 · WhatsApp通知 · AI智能客服
               </p>
             </div>
           </div>
@@ -139,11 +149,11 @@
                 <i class="fas fa-history mr-2"></i>我的預約
               </button>
               <button
-                @click="setView('aiAnalysis')"
-                :class="view === 'aiAnalysis' ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
+                @click="setView('aiCustomerService')"
+                :class="view === 'aiCustomerService' ? 'bg-emerald-600 text-white' : 'bg-slate-200'"
                 class="px-4 py-2 rounded-lg transition-colors"
               >
-                <i class="fas fa-robot mr-2"></i>AI分析
+                <i class="fas fa-robot mr-2"></i>AI客服
               </button>
               <button
                 @click="handleLogout"
@@ -158,143 +168,138 @@
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- 主要內容區域 -->
           <section class="lg:col-span-2">
-            <!-- AI分析頁面 -->
+            <!-- AI客服頁面 -->
             <div
-              v-if="view === 'aiAnalysis'"
+              v-if="view === 'aiCustomerService'"
               class="bg-white rounded-2xl shadow-lg p-6"
             >
               <h2
                 class="text-xl font-semibold mb-6 text-emerald-700 flex items-center"
               >
-                <i class="fas fa-robot mr-2"></i>AI智能症狀分析與推薦
+                <i class="fas fa-robot mr-2"></i>AI智能客服
               </h2>
 
-              <div class="mb-6 p-4 ai-recommendation rounded-xl">
+              <div class="ai-chat-container rounded-xl p-4 mb-4">
                 <h3 class="font-semibold text-blue-700 mb-2 flex items-center">
-                  <i class="fas fa-lightbulb mr-2"></i>AI推薦服務
+                  <i class="fas fa-headset mr-2"></i>24小時智能客服
                 </h3>
                 <p class="text-sm text-blue-600 mb-3">
-                  根據您過往的預約記錄和症狀描述，AI為您推薦以下服務：
+                  您好！我是智能中醫AI客服，可以協助您解答預約、服務、醫師等相關問題。
                 </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div
-                    v-for="service in aiRecommendations"
-                    :key="service.id"
-                    class="bg-white border border-blue-200 rounded-lg p-3 flex items-start"
-                  >
-                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                      <i :class="service.icon" class="text-blue-600"></i>
-                    </div>
-                    <div>
-                      <div class="font-medium text-blue-800">
-                        {{ service.name }}
-                      </div>
-                      <div class="text-xs text-blue-600 mt-1">
-                        {{ service.reason }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
+              <!-- 聊天區域 -->
               <div class="mb-6">
-                <h3 class="font-semibold text-slate-700 mb-3 flex items-center">
-                  <i class="fas fa-chart-line mr-2 text-emerald-500"></i
-                  >您的健康趨勢分析
-                </h3>
-                <div class="bg-slate-50 p-4 rounded-lg">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium">肩頸問題</span>
-                    <span
-                      class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full"
-                      >改善中</span
-                    >
-                  </div>
-                  <div class="w-full bg-slate-200 rounded-full h-2 mb-4">
+                <div class="bg-slate-50 rounded-lg p-4 h-96 overflow-y-auto">
+                  <div class="space-y-4">
+                    <!-- AI歡迎訊息 -->
+                    <div class="flex items-start">
+                      <div
+                        class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-robot text-blue-500"></i>
+                      </div>
+                      <div
+                        class="ai-message bg-white rounded-2xl rounded-tl-none p-4 shadow-sm chat-message"
+                      >
+                        <p class="text-slate-700">
+                          您好！我是智能中醫AI客服，有什麼可以幫您的嗎？
+                        </p>
+                      </div>
+                    </div>
+
+                    <!-- 聊天記錄 -->
                     <div
-                      class="bg-orange-500 h-2 rounded-full"
-                      style="width: 70%"
-                    ></div>
+                      v-for="(msg, index) in chatMessages"
+                      :key="index"
+                      :class="msg.sender === 'user' ? 'justify-end' : 'justify-start'"
+                      class="flex items-start"
+                    >
+                      <div
+                        v-if="msg.sender === 'ai'"
+                        class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-robot text-blue-500"></i>
+                      </div>
+                      <div
+                        :class="msg.sender === 'user' ? 
+                                'user-message bg-blue-500 text-white rounded-2xl rounded-tr-none' : 
+                                'ai-message bg-white rounded-2xl rounded-tl-none'"
+                        class="p-4 shadow-sm chat-message"
+                      >
+                        <p>{{ msg.text }}</p>
+                      </div>
+                      <div
+                        v-if="msg.sender === 'user'"
+                        class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center ml-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-user text-white text-sm"></i>
+                      </div>
+                    </div>
+
+                    <!-- AI回覆 -->
+                    <div v-if="aiResponse" class="flex items-start">
+                      <div
+                        class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-robot text-blue-500"></i>
+                      </div>
+                      <div
+                        class="ai-message bg-white rounded-2xl rounded-tl-none p-4 shadow-sm chat-message"
+                      >
+                        <p class="text-slate-700">{{ aiResponse }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 輸入區域 -->
+                <div class="mt-4">
+                  <div class="flex space-x-2">
+                    <input
+                      type="text"
+                      v-model="userMessage"
+                      placeholder="輸入您的問題..."
+                      class="flex-1 border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      @keyup.enter="sendMessage"
+                    />
+                    <button
+                      @click="sendMessage"
+                      class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <i class="fas fa-paper-plane"></i>
+                    </button>
                   </div>
 
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium">腰痛問題</span>
-                    <span
-                      class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full"
-                      >已改善</span
+                  <!-- 快捷問題 -->
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <button
+                      v-for="(question, index) in quickQuestions"
+                      :key="index"
+                      @click="selectQuickQuestion(question)"
+                      class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded-full transition-colors"
                     >
-                  </div>
-                  <div class="w-full bg-slate-200 rounded-full h-2 mb-4">
-                    <div
-                      class="bg-green-500 h-2 rounded-full"
-                      style="width: 90%"
-                    ></div>
-                  </div>
-
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium">睡眠品質</span>
-                    <span
-                      class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
-                      >穩定</span
-                    >
-                  </div>
-                  <div class="w-full bg-slate-200 rounded-full h-2">
-                    <div
-                      class="bg-blue-500 h-2 rounded-full"
-                      style="width: 60%"
-                    ></div>
+                      {{ question }}
+                    </button>
                   </div>
                 </div>
               </div>
 
+              <!-- 常見問題 -->
               <div>
                 <h3 class="font-semibold text-slate-700 mb-3 flex items-center">
-                  <i class="fas fa-stethoscope mr-2 text-emerald-500"></i
-                  >症狀分析與建議
+                  <i class="fas fa-question-circle mr-2 text-emerald-500"></i
+                  >常見問題
                 </h3>
-                <div class="bg-slate-50 p-4 rounded-lg">
-                  <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-2"
-                      >請描述您目前的症狀或不適：</label
-                    >
-                    <textarea
-                      v-model="symptomDescription"
-                      rows="3"
-                      class="w-full border border-slate-300 p-3 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      placeholder="例如：最近一週頸部僵硬，右肩疼痛，影響睡眠..."
-                    ></textarea>
-                  </div>
-                  <button
-                    @click="analyzeSymptoms"
-                    class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center"
-                  >
-                    <i class="fas fa-search mr-2"></i>AI分析症狀
-                  </button>
-
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div
-                    v-if="symptomAnalysis"
-                    class="mt-4 p-4 bg-white rounded-lg border border-emerald-200"
+                    v-for="(faq, index) in faqs"
+                    :key="index"
+                    @click="selectQuickQuestion(faq.question)"
+                    class="bg-slate-50 p-3 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors"
                   >
-                    <h4 class="font-semibold text-emerald-700 mb-2">
-                      AI分析結果：
-                    </h4>
-                    <p class="text-sm text-slate-700 mb-3">
-                      {{ symptomAnalysis.summary }}
-                    </p>
-                    <div class="text-sm">
-                      <div class="font-medium text-slate-700 mb-1">
-                        建議治療方案：
-                      </div>
-                      <ul
-                        class="list-disc list-inside text-slate-600 space-y-1"
-                      >
-                        <li
-                          v-for="treatment in symptomAnalysis.recommendedTreatments"
-                          :key="treatment"
-                        >
-                          {{ treatment }}
-                        </li>
-                      </ul>
+                    <div class="font-medium text-slate-700 text-sm">
+                      {{ faq.question }}
                     </div>
                   </div>
                 </div>
@@ -471,7 +476,7 @@
                 <!-- AI推薦提示 -->
                 <div
                   v-if="aiRecommendations.length > 0"
-                  class="mb-6 p-4 ai-recommendation rounded-xl"
+                  class="mb-6 p-4 ai-chat-container rounded-xl"
                 >
                   <div class="flex items-center mb-2">
                     <i class="fas fa-robot text-blue-600 mr-2"></i>
@@ -857,7 +862,7 @@
                   • 會員專屬管理<br />
                   • 線上修改預約<br />
                   • 智能床位分配<br />
-                  • AI症狀分析與推薦
+                  • AI智能客服支援
                 </p>
               </div>
             </div>
@@ -1000,8 +1005,31 @@
           const editingBooking = ref(null);
           const loginPhone = ref("");
           const sendWhatsApp = ref(true);
-          const symptomDescription = ref("");
-          const symptomAnalysis = ref(null);
+
+          // AI客服相關變數
+          const userMessage = ref("");
+          const chatMessages = ref([]);
+          const aiResponse = ref("");
+          const quickQuestions = ref([
+            "如何取消預約？",
+            "營業時間是？",
+            "有哪些服務項目？",
+            "醫師專長是什麼？",
+            "如何更改預約時間？",
+            "診所地址在哪裡？",
+            "可以刷卡嗎？",
+          ]);
+
+          const faqs = ref([
+            { question: "如何取消預約？" },
+            { question: "營業時間是幾點到幾點？" },
+            { question: "有哪些服務項目？" },
+            { question: "醫師的專長是什麼？" },
+            { question: "如何更改預約時間？" },
+            { question: "診所地址在哪裡？" },
+            { question: "可以刷卡付款嗎？" },
+            { question: "有停車場嗎？" },
+          ]);
 
           // AI推薦資料
           const aiRecommendations = ref([
@@ -1302,6 +1330,63 @@
             }
           };
 
+          // AI客服功能
+          const sendMessage = () => {
+            if (!userMessage.value.trim()) return;
+
+            // 添加用戶訊息到聊天記錄
+            chatMessages.value.push({
+              sender: "user",
+              text: userMessage.value,
+            });
+
+            // 模擬AI回覆（實際應用中這裡應該調用AI API）
+            setTimeout(() => {
+              const responses = {
+                "如何取消預約？":
+                  "您可以在『我的預約』頁面中找到要取消的預約，點擊取消按鈕即可。取消預約請至少提前2小時通知我們。",
+                "營業時間是？":
+                  "我們的營業時間是週一至週五 9:00-18:00，週六 9:00-12:00，週日及國定假日休息。",
+                "有哪些服務項目？":
+                  "我們提供推拿治療、針灸治療、推拿+針灸綜合治療以及新症諮詢服務。詳細內容請參考預約頁面。",
+                "醫師專長是什麼？":
+                  "陳醫師專長推拿，李醫師專長針灸，黃醫師專長綜合治療，何醫師專長內科調理。您可以在預約時選擇適合的醫師。",
+                "如何更改預約時間？":
+                  "在『我的預約』頁面點擊『更改』按鈕，即可重新選擇時間和醫師。",
+                "診所地址在哪裡？":
+                  "我們的地址是台北市大安區忠孝東路四段123號5樓，近忠孝復興捷運站。",
+                "可以刷卡嗎？": "可以的！我們接受現金、信用卡及行動支付。",
+                "有停車場嗎？": "診所附近有付費停車場，步行約3-5分鐘。",
+              };
+
+              // 預設回覆
+              let response =
+                "感謝您的提問！如需更詳細的資訊，請致電我們的服務專線：02-1234-5678";
+
+              // 關鍵詞匹配
+              const userQuestion = userMessage.value.toLowerCase();
+              for (const [key, value] of Object.entries(responses)) {
+                if (
+                  userQuestion.includes(key.replace("？", "").toLowerCase())
+                ) {
+                  response = value;
+                  break;
+                }
+              }
+
+              aiResponse.value = response;
+
+              // 清空輸入框
+              userMessage.value = "";
+            }, 1000);
+          };
+
+          // 選擇快捷問題
+          const selectQuickQuestion = (question) => {
+            userMessage.value = question;
+            sendMessage();
+          };
+
           // AI功能
           const generateAIRecommendations = () => {
             // 模擬從API獲取AI推薦
@@ -1322,55 +1407,6 @@
                 },
               ];
             }, 500);
-          };
-
-          const analyzeSymptoms = () => {
-            if (!symptomDescription.value.trim()) {
-              alert("請輸入症狀描述");
-              return;
-            }
-
-            // 模擬API調用進行症狀分析
-            // 這裡可以調用實際的AI API
-            symptomAnalysis.value = null;
-
-            setTimeout(() => {
-              // 簡單的關鍵詞匹配來模擬AI分析
-              const symptoms = symptomDescription.value.toLowerCase();
-              let summary = "";
-              let treatments = [];
-
-              if (symptoms.includes("頸") || symptoms.includes("肩")) {
-                summary = "根據您的描述，您可能有肩頸肌肉緊張或勞損的問題。";
-                treatments = [
-                  "推拿治療放鬆肌肉",
-                  "針灸疏通經絡",
-                  "熱敷緩解不適",
-                ];
-              } else if (symptoms.includes("腰") || symptoms.includes("背")) {
-                summary = "您的症狀可能與腰部肌肉勞損或姿勢不良有關。";
-                treatments = [
-                  "推拿治療緩解肌肉緊張",
-                  "針灸止痛",
-                  "姿勢矯正指導",
-                ];
-              } else if (symptoms.includes("頭") || symptoms.includes("痛")) {
-                summary = "您的頭痛可能與壓力、肌肉緊張或循環問題相關。";
-                treatments = ["針灸緩解頭痛", "推拿放鬆頸部肌肉", "中藥調理"];
-              } else {
-                summary =
-                  "根據您的症狀描述，建議進行綜合評估以確定最適合的治療方案。";
-                treatments = [
-                  "新症諮詢進行全面評估",
-                  "根據評估結果制定個性化治療計劃",
-                ];
-              }
-
-              symptomAnalysis.value = {
-                summary,
-                recommendedTreatments: treatments,
-              };
-            }, 1500);
           };
 
           // 初始化
@@ -1400,8 +1436,11 @@
             editingBooking,
             loginPhone,
             sendWhatsApp,
-            symptomDescription,
-            symptomAnalysis,
+            userMessage,
+            chatMessages,
+            aiResponse,
+            quickQuestions,
+            faqs,
             aiRecommendations,
             timeslots,
             myBookings,
@@ -1418,7 +1457,8 @@
             cancelEdit,
             updateBooking,
             resetBooking,
-            analyzeSymptoms,
+            sendMessage,
+            selectQuickQuestion,
             addMinutes,
             formatShort,
             formatDate,
