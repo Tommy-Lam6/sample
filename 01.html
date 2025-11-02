@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>康怡中醫 - 專業診療預約平台</title>
@@ -11,7 +11,7 @@
     <nav class="navbar">
         <div class="logo">
             <i>🌿</i> 康怡中醫
-        </div>
+          </div>
         <div class="nav-links">
             <a href="#services">服務項目</a>
             <a href="#AI query">AI 查詢</a>
@@ -38,7 +38,7 @@
                     <div class="service-header">
                         <h3>中醫開方</h3>
                         <p>15分鐘專業診療</p>
-                    </div>
+      </div>
                     <div class="service-body">
                         <p>專業中醫師根據您的體質和症狀，為您量身定制中藥處方。</p>
                         <p><strong>適用於:</strong> 各種慢性病調理、亞健康狀態改善、體質調理。</p>
@@ -47,30 +47,30 @@
                     <div class="service-footer">
                         <span class="price">$200</span>
                         <button class="service-btn" onclick="selectService(1)">預約</button>
-                    </div>
-                </div>
-                
+            </div>
+          </div>
+
                 <div class="service-card">
                     <div class="service-header">
                         <h3>針灸治療</h3>
                         <p>15分鐘專業治療</p>
-                    </div>
+            </div>
                     <div class="service-body">
                         <p>運用傳統針灸技術，疏通經絡，調和氣血，緩解疼痛。</p>
                         <p><strong>適用於:</strong> 各種痛症、神經系統疾病、內科雜病。</p>
                         <p><strong>注意事項:</strong> 治療前請適量進食，避免空腹接受治療。</p>
-                    </div>
+                  </div>
                     <div class="service-footer">
                         <span class="price">$250</span>
                         <button class="service-btn" onclick="selectService(2)">預約</button>
-                    </div>
+                  </div>
                 </div>
-                
+
                 <div class="service-card">
                     <div class="service-header">
                         <h3>推拿按摩</h3>
                         <p>30分鐘專業手法</p>
-                    </div>
+                  </div>
                     <div class="service-body">
                         <p>傳統中醫推拿手法，放鬆肌肉，緩解疲勞，促進循環。</p>
                         <p><strong>適用於:</strong> 肌肉酸痛、疲勞乏力、運動損傷恢復。</p>
@@ -79,24 +79,24 @@
                     <div class="service-footer">
                         <span class="price">$350</span>
                         <button class="service-btn" onclick="selectService(3)">預約</button>
-                    </div>
+                  </div>
                 </div>
-                
+
                 <div class="service-card">
                     <div class="service-header">
                         <h3>新症全面診療</h3>
                         <p>1小時15分鐘全面檢查</p>
-                    </div>
+                  </div>
                     <div class="service-body">
                         <p>包含詳細問診、舌診、脈診及綜合治療方案制定。</p>
                         <p><strong>適用於:</strong> 首次就診患者，需要全面診斷和治療方案者。</p>
                         <p><strong>注意事項:</strong> 請預留充足時間，攜帶所有相關醫療記錄。</p>
-                    </div>
+                  </div>
                     <div class="service-footer">
                         <span class="price">$600</span>
                         <button class="service-btn" onclick="selectService(4)">預約</button>
-                    </div>
                 </div>
+              </div>
             </div>
         </section>
 
@@ -108,26 +108,36 @@
                     <div class="form-group">
                         <label for="email">電子郵箱</label>
                         <input type="email" id="email" class="form-control" placeholder="請輸入您的郵箱">
-                    </div>
+          </div>
                     <div class="form-group">
                         <label for="password">密碼</label>
                         <input type="password" id="password" class="form-control" placeholder="請輸入密碼">
-                    </div>
+        </div>
                     <button class="btn" onclick="login()">登入</button>
                     <p style="margin-top: 1rem;">還沒有帳號？ <a href="#" style="color: var(--primary);">點擊註冊</a></p>
-                </div>
+            </div>
 
                 <div id="booking-form" style="display:none;">
                     <div class="form-group">
                         <label>選擇服務</label>
-                        <div>
+            <div>
                             <button class="service-btn" onclick="selectService(1)">中醫開方</button>
                             <button class="service-btn" onclick="selectService(2)">針灸治療</button>
                             <button class="service-btn" onclick="selectService(3)">推拿按摩</button>
                             <button class="service-btn" onclick="selectService(4)">新症全面診療</button>
-                        </div>
-                    </div>
-                    
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1"
+                >日期</label
+              >
+              <input
+                type="date"
+                v-model="selectedDate"
+                class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
                     <div class="form-group">
                         <label>選擇日期</label>
                         <div class="calendar">
@@ -140,9 +150,9 @@
                             <div class="calendar-day">6</div>
                             <div class="calendar-day">7</div>
                             <!-- 更多日期 -->
-                        </div>
-                    </div>
-                    
+            </div>
+          </div>
+
                     <div class="form-group">
                         <label>選擇時間</label>
                         <div class="time-slots">
@@ -158,12 +168,12 @@
                             <div class="time-slot">15:30</div>
                             <div class="time-slot">16:00</div>
                             <div class="time-slot">16:30</div>
-                        </div>
-                    </div>
-                    
+          </div>
+        </div>
+
                     <button class="btn" id="confirm-booking">確認預約</button>
                 </div>
-            </div>
+              </div>
         </section>
 
         <!-- 用戶帳戶區域 -->
@@ -190,10 +200,10 @@
                         <div class="service-footer">
                             <button class="service-btn">修改</button>
                             <button class="service-btn" style="background: var(--primary);">取消</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
+        </div>
+      </div>
+    </div>
         </section>
     </main>
 
@@ -223,7 +233,7 @@
                     this.classList.add('selected');
                 });
             });
-            
+
             // 確認預約按鈕效果
             const confirmBtn = document.getElementById('confirm-booking');
             confirmBtn.addEventListener('click', function() {
@@ -249,7 +259,7 @@
                 btn.addEventListener('mouseover', function() {
                     this.style.transform = 'scale(1.05)';
                 });
-                
+
                 btn.addEventListener('mouseout', function() {
                     this.style.transform = '';
                 });
@@ -278,7 +288,7 @@
             document.getElementById('booking').scrollIntoView({ 
                 behavior: 'smooth' 
             });
-        }
+            }
         
         // 模擬登錄功能
         function login() {
@@ -299,7 +309,7 @@
             loginMsg.style.textAlign = 'center';
             
             document.getElementById('booking').prepend(loginMsg);
-            
+
             // 3秒後消失
             setTimeout(() => {
                 loginMsg.style.display = 'none';
@@ -311,5 +321,5 @@
             return document.getElementById('booking-form').style.display === 'block';
         }
     </script>
-</body>
+  </body>
 </html>
